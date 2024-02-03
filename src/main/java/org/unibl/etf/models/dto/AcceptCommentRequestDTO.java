@@ -1,7 +1,8 @@
 package org.unibl.etf.models.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,10 +12,10 @@ import org.unibl.etf.models.validators.XSSValidators;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChangeUserRoleDTO {
+public class AcceptCommentRequestDTO {
     @NotBlank
-    @Pattern(regexp = "^(Client|Moderator|Admin)$")
+    @Size(max=1000)
     @XSSValidators
     @SqlValidators
-    private String role;
+    private String message;
 }

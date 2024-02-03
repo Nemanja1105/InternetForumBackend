@@ -1,6 +1,7 @@
 package org.unibl.etf.advices;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -16,6 +17,12 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private final HttpServletRequest request;
+
+    public GlobalExceptionHandler(HttpServletRequest request) {
+        this.request = request;
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException exception) {
         Map<String, String> errors = new HashMap<>();
@@ -25,6 +32,12 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Object> handleUnauthorizedException(BadRequestException e)
+    {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UnauthorizedException.class)

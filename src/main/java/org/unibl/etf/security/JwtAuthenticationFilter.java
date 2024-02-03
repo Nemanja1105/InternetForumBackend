@@ -15,6 +15,7 @@ import org.unibl.etf.services.JwtService;
 import org.unibl.etf.services.JwtUserDetailsService;
 
 
+import java.io.BufferedReader;
 import java.io.IOException;
 
 
@@ -40,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
                 return;
             }
+
             String jwt = authorizationHeader.substring(7);
             String username = jwtService.extractUsername(jwt);
 

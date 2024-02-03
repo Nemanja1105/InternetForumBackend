@@ -3,11 +3,13 @@ package org.unibl.etf.controllers;
 
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.unibl.etf.models.dto.ChangeUserPermissionsDTO;
 import org.unibl.etf.models.dto.ChangeUserRoleDTO;
 import org.unibl.etf.models.dto.UserDetailsDTO;
 import org.unibl.etf.services.UserService;
+import org.unibl.etf.services.WAFService;
 
 import java.util.List;
 
@@ -17,9 +19,11 @@ import java.util.List;
 public class UsersController {
 
     private final UserService userService;
+    private final WAFService wafService;
 
-    public UsersController(UserService userService) {
+    public UsersController(UserService userService, WAFService wafService) {
         this.userService = userService;
+        this.wafService = wafService;
     }
 
     @GetMapping
@@ -38,12 +42,14 @@ public class UsersController {
     }
 
     @PutMapping("/{id}/role")
-    public void changeRole(@PathVariable Long id,@Valid @RequestBody ChangeUserRoleDTO roleDTO){
+    public void changeRole(@PathVariable Long id, @Valid @RequestBody ChangeUserRoleDTO roleDTO, BindingResult bindingResult){
+        this.wafService.checkRequest(bindingResult);
         this.userService.changeRole(id,roleDTO);
     }
 
     @PutMapping("/{id}/permissions")
-    public void changePermissions(@PathVariable Long id, @Valid @RequestBody ChangeUserPermissionsDTO permissionsDTO){
+    public void changePermissions(@PathVariable Long id, @Valid @RequestBody ChangeUserPermissionsDTO permissionsDTO,BindingResult bindingResult){
+        this.wafService.checkRequest(bindingResult);
         this.userService.changePermissions(id,permissionsDTO);
     }
 }

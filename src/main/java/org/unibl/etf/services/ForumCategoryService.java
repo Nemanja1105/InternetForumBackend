@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ForumCategoryService {
     List<ForumCategoryEntity> findAll();
+    ForumCategoryEntity findById(Long id);
 }

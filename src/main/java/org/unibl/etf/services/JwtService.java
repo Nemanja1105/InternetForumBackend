@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.unibl.etf.models.dto.JwtUserDTO;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -20,4 +21,5 @@ public interface JwtService {
     );
 
     boolean isTokenValid(String token, UserDetails userDetails);
+     boolean isTokenExpired(String token);
 }

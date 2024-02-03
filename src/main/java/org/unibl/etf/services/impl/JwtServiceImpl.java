@@ -6,9 +6,11 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.unibl.etf.models.dto.JwtUserDTO;
+import org.unibl.etf.services.JwtBlackListService;
 import org.unibl.etf.services.JwtService;
 
 import java.security.Key;
@@ -23,6 +25,21 @@ public class JwtServiceImpl implements JwtService {
     private String secretKey;
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
+
+    private final JwtBlackListService jwtBlackListService;
+
+    @Scheduled(cron="0 0 21 * * *")//9 navece
+    public void clearExpiredTokens(){
+        var tokens=this.jwtBlackListService.findAll();
+        for(var token:tokens){
+            if(this.isTokenExpired(token.getToken()))
+                this.jwtBlackListService.delete(token);
+        }
+    }
+
+    public JwtServiceImpl(JwtBlackListService jwtBlackListService) {
+        this.jwtBlackListService = jwtBlackListService;
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -64,10 +81,10 @@ public class JwtServiceImpl implements JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token) && !this.jwtBlackListService.isInBlacklist(token);
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 

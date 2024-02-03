@@ -21,6 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.unibl.etf.models.enums.Role;
 import org.unibl.etf.services.JwtUserDetailsService;
 
 import java.util.Arrays;
@@ -81,18 +82,44 @@ public class WebSecurityConfig {
     }*/
 
     @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf(csrf -> csrf.disable())
-                //.cors(cors -> cors.configurationSource(apiConfigurationSource()))
+
                 //.cors(cors->cors.disable())
                 // .cors(Customizer.withDefaults())
                 // .cors(cors->cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()))
                 //.csrf(csrf -> csrf.csrfTokenRequestHandler(new XorCsrfTokenRequestAttributeHandler()))
                 .authorizeHttpRequests((authorize) -> authorize
                                 //.requestMatchers("/**").permitAll()
-                                .requestMatchers("/**").permitAll()
-                                .requestMatchers("/api/v1/images").permitAll()
+
+
+                                .requestMatchers(HttpMethod.GET,"/api/v1/permissions").hasAuthority(Role.ADMIN.getStatus())
+                                .requestMatchers(HttpMethod.GET,"/api/v1/auth/**").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/v1/auth/**").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/api/v1/users").hasAuthority(Role.ADMIN.getStatus())
+                                .requestMatchers(HttpMethod.PUT,"/api/v1/users/**").hasAuthority(Role.ADMIN.getStatus())
+                                .requestMatchers(HttpMethod.GET,"/api/v1/forum/categories/**").authenticated()
+                                .requestMatchers(HttpMethod.GET,"/api/v1/forum/*/comments").authenticated()
+                                .requestMatchers(HttpMethod.GET,"/api/v1/forum/comments/**").hasAnyAuthority(Role.MODERATOR.getStatus(),Role.ADMIN.getStatus())
+                                .requestMatchers(HttpMethod.PUT,"/api/v1/forum/comments/**").hasAnyAuthority(Role.MODERATOR.getStatus(),Role.ADMIN.getStatus())
+                                .requestMatchers(HttpMethod.DELETE,"/api/v1/forum/comments/**").hasAnyAuthority(Role.MODERATOR.getStatus(),Role.ADMIN.getStatus())
+                                .requestMatchers(HttpMethod.POST,"/api/v1/forum/*/comments").hasAuthority("create")
+                                .requestMatchers(HttpMethod.DELETE,"/api/v1/forum/*/comments/**").hasAuthority("delete")
+                                .requestMatchers(HttpMethod.PUT,"/api/v1/forum/*/comments/**").hasAuthority("update")
+                                .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+                                .anyRequest().denyAll()
                         // .requestMatchers("/api/v1/image").permitAll()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
@@ -117,15 +144,7 @@ public class WebSecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }*/
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+
 
 
 

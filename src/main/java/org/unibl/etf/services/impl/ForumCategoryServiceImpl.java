@@ -2,6 +2,7 @@ package org.unibl.etf.services.impl;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.unibl.etf.exceptions.NotFoundException;
 import org.unibl.etf.models.entities.ForumCategoryEntity;
 import org.unibl.etf.repositories.ForumCategoryRepository;
 import org.unibl.etf.services.ForumCategoryService;
@@ -21,5 +22,10 @@ public class ForumCategoryServiceImpl implements ForumCategoryService {
     @Override
     public List<ForumCategoryEntity> findAll() {
         return this.forumCategoryRepository.findAll();
+    }
+
+    @Override
+    public ForumCategoryEntity findById(Long id) {
+        return this.forumCategoryRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 }

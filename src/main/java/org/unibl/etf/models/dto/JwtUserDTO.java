@@ -21,13 +21,14 @@ public class JwtUserDTO implements UserDetails {
     private Long id;
     private String username;
     private String password;
+    private boolean status;
     private Role role;
     private List<PermissionEntity> permissions;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(role.name()));
+        authorities.add(new SimpleGrantedAuthority(role.getStatus()));
         permissions.forEach(el->authorities.add(new SimpleGrantedAuthority(el.getName())));
         return authorities;
     }

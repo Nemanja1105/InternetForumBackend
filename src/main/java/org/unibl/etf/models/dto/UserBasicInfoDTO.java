@@ -1,6 +1,5 @@
 package org.unibl.etf.models.dto;
 
-import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,10 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VerificationRequestDTO {
-    @NotNull
+public class UserBasicInfoDTO {
     private Long id;
-    @NotBlank
-    @Size(max = 4,min=4)
-    private String code;
+    private String name;
+    private String surname;
+    private String username;
 }
