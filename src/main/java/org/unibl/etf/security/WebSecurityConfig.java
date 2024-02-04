@@ -59,44 +59,27 @@ public class WebSecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    /*@Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-               // .cors(cors -> cors.disable())
-                .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
-                .authenticationProvider(authenticationProvider())
-                .authorizeHttpRequests((authorize) -> authorize
-                              //  .requestMatchers("/api/v1/auth/**").permitAll()
-                               //  .requestMatchers( "**")
-                               // .anyRequest()
-                             //   .authenticated()
-                          //      .requestMatchers()
-                                .requestMatchers("/**").permitAll()
-                        //  .requestMatchers("/students/**").hasRole("ADMIN")
-                       //.anyRequest().permitAll()
-                )
-                .addFilterBefore(
-                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }*/
 
-    @Bean
+   @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE"));
+        configuration.setAllowedOrigins(Arrays.asList("https://localhost:4200"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
     }
 
+
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf(csrf -> csrf.disable())
 
+                .cors(cors->cors.configurationSource(corsConfigurationSource()))
                 //.cors(cors->cors.disable())
                 // .cors(Customizer.withDefaults())
                 // .cors(cors->cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()))
@@ -128,11 +111,7 @@ public class WebSecurityConfig {
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         // .httpBasic(Customizer.withDefaults());
         return httpSecurity.build();
-//        httpSecurity = httpSecurity.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();
-//         = httpSecurity.authorizeHttpRequests().anyRequest().permitAll().and();
-//
-//        httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-//        return httpSecurity.build();
+
     }
 
 

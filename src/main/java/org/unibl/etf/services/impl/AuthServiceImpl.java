@@ -167,30 +167,31 @@ public class AuthServiceImpl implements AuthService {
             return responseUser;
 
 
+
     }
 
-    private UserEntity registerOrLoad(GithubUserDTO user){
-        if(this.userRepository.existsByEmail(user.getEmail())){
+    private UserEntity registerOrLoad(GithubUserDTO user) {
+        System.out.println(user.getEmail());
+        if (this.userRepository.existsByEmail(user.getEmail())) {
             return this.userRepository.findByEmail(user.getEmail()).get();
         }
-        UserEntity userEntity=new UserEntity();
+        UserEntity userEntity = new UserEntity();
         userEntity.setId(null);
         userEntity.setUsername(user.getLogin());
         userEntity.setPassword(null);
         userEntity.setEmail(user.getEmail());
-        if(user.getName()!=null) {
+        if (user.getName() != null) {
             var tmp = user.getName().split(" ");
             userEntity.setName(tmp[0]);
             userEntity.setSurname(tmp[1]);
-        }
-        else{
+        } else {
             userEntity.setName(user.getLogin());
             userEntity.setSurname(user.getLogin());
         }
         userEntity.setRole(Role.CLIENT);
         userEntity.setStatus(true);
         userEntity.setVerified(true);
-        userEntity=this.userRepository.saveAndFlush(userEntity);
+        userEntity = this.userRepository.saveAndFlush(userEntity);
         this.entityManager.refresh(userEntity);
         return userEntity;
     }
